@@ -1,0 +1,7 @@
+<footer th:fragment="footer" class="site-footer"
+        xmlns:th="http://www.thymeleaf.org">
+    <div class="footer-container">
+        <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2026</span>
+            <span th:text="${appNombre}">Mi App</span> — Todos los derechos reservados.</p>
+    </div>
+</footer>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-base}">
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+<h1 layout:fragment="page-title">Dashboard</h1>
+<div layout:fragment="content">
+    <div class="admin-welcome">
+        <h2>Bienvenido al Panel de Administración</h2>
+        <p>Este es tu dashboard. Agregá widgets, estadísticas y accesos rápidos según el proyecto.</p>
+    </div>
+
+    <div class="stats-grid">
+        <a class="stat-card" th:href="@{/admin/usuarios}">
+            <span class="stat-number" th:text="${totalUsuarios}">0</span>
+            <span class="stat-label">Usuarios Registrados</span>
+        </a>
+        <a class="stat-card" th:href="@{/admin/usuarios(activo=true)}">
+            <span class="stat-number" th:text="${usuariosActivos}">0</span>
+            <span class="stat-label">Usuarios Activos</span>
+        </a>
+    </div>
+</div>
+</body>
+</html>

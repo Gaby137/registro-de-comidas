@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Inicio</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Bienvenido a <span class="highlight" th:text="${appNombre}">Mi App</span></h1>
+            <p>Tu starter kit está funcionando correctamente. Empezá a construir tu proyecto.</p>
+            <div class="hero-actions">
+                <a th:href="@{/registro}" class="btn btn-primary">Crear Cuenta</a>
+                <a th:href="@{/login}" class="btn btn-outline">Iniciar Sesión</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>🔐 Seguridad</h3>
+                <p>Login con sesiones, CSRF y panel de administración. Listo para usar.</p>
+            </div>
+            <div class="feature-card">
+                <h3>📁 Upload Seguro</h3>
+                <p>Subida de archivos con validación de magic bytes y MIME type.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🔍 Filtros Dinámicos</h3>
+                <p>Specifications de Spring Data para consultas combinables.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🐳 Docker Ready</h3>
+                <p>Dockerfile multi-stage + docker-compose para despliegue inmediato.</p>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>
