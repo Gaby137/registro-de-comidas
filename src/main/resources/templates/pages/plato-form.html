@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/app}">
+<head>
+    <title th:text="${plato.id == null} ? 'Nuevo plato' : 'Editar plato'">Plato</title>
+</head>
+<body>
+<div layout:fragment="content" class="angosto">
+    <h1 class="titulo-pagina" th:text="${plato.id == null} ? 'Nuevo plato' : 'Editar plato'">Plato</h1>
+
+    <form th:action="${plato.id == null} ? @{/platos} : @{/platos/{id}/editar(id=${plato.id})}" method="post"
+          class="formulario">
+        <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" th:value="${plato.nombre}" maxlength="120" required
+                   autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label for="descripcion">Descripción corta</label>
+            <textarea id="descripcion" name="descripcion" maxlength="500" th:text="${plato.descripcion}"
+                      placeholder="Qué lleva y porción aproximada"></textarea>
+            <span class="ayuda" th:if="${plato.id != null}">
+                Cambiar la descripción actualiza lo que se ve en todos los registros de este plato.
+            </span>
+        </div>
+
+        <div class="acciones">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a class="btn btn-outline" th:href="@{/platos}">Cancelar</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

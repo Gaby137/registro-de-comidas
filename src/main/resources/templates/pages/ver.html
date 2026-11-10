@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<!-- Vista de la nutricionista: solo lectura, sin ningún control para editar, borrar ni comentar. -->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/publico}">
+<head>
+    <title>Registro de comidas</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="publico-titulo">Registro de comidas</h1>
+    <div th:replace="~{fragments/semana :: semana(${semana}, '/ver/' + ${token}, '/ver/' + ${token} + '/fotos', true)}"></div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/semana.js}"></script>
+</th:block>
+</body>
+</html>

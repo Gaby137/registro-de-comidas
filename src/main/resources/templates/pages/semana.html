@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/app}">
+<head>
+    <title>Semana</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div th:replace="~{fragments/semana :: semana(${semana}, '/semana', '/fotos', false)}"></div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/semana.js}"></script>
+</th:block>
+</body>
+</html>

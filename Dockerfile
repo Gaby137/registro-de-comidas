@@ -19,7 +19,7 @@ WORKDIR /app
 
 # Usuario no-root por seguridad
 RUN groupadd -r appuser && useradd -r -g appuser appuser \
-    && mkdir -p /app/uploads && chown -R appuser:appuser /app
+    && mkdir -p /app/fotos && chown -R appuser:appuser /app
 
 COPY --from=builder --chown=appuser:appuser /app/target/*.jar app.jar
 USER appuser

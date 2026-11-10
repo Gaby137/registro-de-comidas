@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/app}">
+<head>
+    <title>Platos</title>
+</head>
+<body>
+<div layout:fragment="content" class="angosto">
+    <h1 class="titulo-pagina">Platos</h1>
+
+    <a class="btn btn-primary btn-full" th:href="@{/platos/nuevo}">Nuevo plato</a>
+
+    <section class="seccion">
+        <h2>En la selección rápida</h2>
+        <p class="vacio" th:if="${#lists.isEmpty(activos)}">Todavía no hay platos.</p>
+        <ul class="lista-platos" th:unless="${#lists.isEmpty(activos)}">
+            <li class="plato" th:each="p : ${activos}">
+                <div class="plato-datos">
+                    <div class="plato-nombre" th:text="${p.nombre}">Milanesa con ensalada</div>
+                    <div class="plato-desc" th:if="${p.descripcion}" th:text="${p.descripcion}">Una milanesa</div>
+                </div>
+                <div class="plato-acciones">
+                    <a class="btn btn-outline btn-sm" th:href="@{/platos/{id}/editar(id=${p.id})}">Editar</a>
+                    <form th:action="@{/platos/{id}/archivar(id=${p.id})}" method="post">
+                        <input type="hidden" name="archivado" value="true">
+                        <button type="submit" class="btn btn-outline btn-sm">Archivar</button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <section class="seccion" th:unless="${#lists.isEmpty(archivados)}">
+        <h2>Archivados</h2>
+        <p class="ayuda">No aparecen en la selección rápida. Los registros viejos los siguen mostrando.</p>
+        <ul class="lista-platos mt-sm">
+            <li class="plato archivado" th:each="p : ${archivados}">
+                <div class="plato-datos">
+                    <div class="plato-nombre" th:text="${p.nombre}">Tarta de verdura</div>
+                    <div class="plato-desc" th:if="${p.descripcion}" th:text="${p.descripcion}">Dos porciones</div>
+                </div>
+                <div class="plato-acciones">
+                    <a class="btn btn-outline btn-sm" th:href="@{/platos/{id}/editar(id=${p.id})}">Editar</a>
+                    <form th:action="@{/platos/{id}/archivar(id=${p.id})}" method="post">
+                        <input type="hidden" name="archivado" value="false">
+                        <button type="submit" class="btn btn-outline btn-sm">Restaurar</button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </section>
+</div>
+</body>
+</html>

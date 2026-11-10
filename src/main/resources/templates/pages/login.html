@@ -3,19 +3,19 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 <head>
-    <title>Iniciar Sesión</title>
+    <title>Iniciar sesión</title>
     <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
 <body>
 <main layout:fragment="content">
     <div class="auth-container">
         <div class="auth-card">
-            <h2>Iniciar Sesión</h2>
+            <h1>Iniciar sesión</h1>
 
             <div th:replace="~{fragments/alertas :: alertas}"></div>
 
             <div th:if="${param.error}" class="alert alert-error">
-                Email o contraseña incorrectos, o la cuenta está desactivada.
+                Email o contraseña incorrectos.
             </div>
             <div th:if="${param.logout}" class="alert alert-info">
                 Cerraste sesión correctamente.
@@ -24,20 +24,15 @@
             <form th:action="@{/login}" method="post" class="auth-form">
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required
-                           placeholder="tu@email.com" autocomplete="email">
+                    <input type="email" id="email" name="email" required autocomplete="username">
                 </div>
                 <div class="form-group">
                     <label for="contrasena">Contraseña</label>
                     <input type="password" id="contrasena" name="contrasena" required
-                           placeholder="••••••" autocomplete="current-password">
+                           autocomplete="current-password">
                 </div>
                 <button type="submit" class="btn btn-primary btn-full">Ingresar</button>
             </form>
-
-            <p class="auth-link">
-                ¿No tenés cuenta? <a th:href="@{/registro}">Registrate</a>
-            </p>
         </div>
     </div>
 </main>

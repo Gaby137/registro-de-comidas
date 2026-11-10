@@ -1,0 +1,16 @@
+<!--
+  Selección rápida: los platos como botones grandes, ya ordenados por SeleccionRapidaService
+  (primero los más usados en esta franja horaria). Lo pide carga.js con fetch.
+-->
+<div th:fragment="lista" xmlns:th="http://www.thymeleaf.org" class="platos-rapidos">
+    <button type="button" class="plato-btn"
+            th:each="p : ${opciones}"
+            th:classappend="${p.frecuente} ? 'frecuente'"
+            th:attr="data-plato-id=${p.id}, data-nombre=${p.nombre}">
+        <span class="plato-btn-nombre" th:text="${p.nombre}">Milanesa con ensalada</span>
+        <span class="plato-btn-desc" th:if="${p.descripcion}" th:text="${p.descripcion}">Una milanesa, ensalada mixta</span>
+    </button>
+    <p class="vacio" th:if="${#lists.isEmpty(opciones)}">
+        Todavía no hay platos. Tocá <strong>Plato nuevo</strong> para crear el primero.
+    </p>
+</div>

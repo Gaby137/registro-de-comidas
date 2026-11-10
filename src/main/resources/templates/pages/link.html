@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/app}">
+<head>
+    <title>Link compartido</title>
+</head>
+<body>
+<div layout:fragment="content" class="angosto">
+    <h1 class="titulo-pagina">Link compartido</h1>
+
+    <div class="tarjeta" th:if="${url}">
+        <p>Quien tenga este link puede ver tus comidas, sin cuenta y sin poder cambiar nada.</p>
+        <code class="link-url mt-sm" id="linkUrl" th:text="${url}">https://ejemplo.com/ver/abc</code>
+        <div class="acciones">
+            <button type="button" class="btn btn-primary" id="btnCopiar">Copiar link</button>
+            <a class="btn btn-outline" th:href="${url}" target="_blank" rel="noopener">Abrir</a>
+        </div>
+        <p class="ayuda mt-sm" id="copiado" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="tarjeta" th:unless="${url}">
+        <p>No hay ningún link activo. Nadie puede ver tus comidas sin tu cuenta.</p>
+    </div>
+
+    <section class="seccion">
+        <form th:action="@{/link/generar}" method="post">
+            <button type="submit" class="btn btn-outline btn-full"
+                    th:text="${url} ? 'Generar un link nuevo' : 'Generar link'">Generar link</button>
+        </form>
+        <p class="ayuda mt-sm" th:if="${url}">El link actual deja de funcionar al instante.</p>
+
+        <form th:action="@{/link/revocar}" method="post" th:if="${url}" class="mt-sm">
+            <button type="submit" class="btn btn-danger btn-full">Revocar link</button>
+        </form>
+    </section>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        (function () {
+            const boton = document.getElementById('btnCopiar');
+            if (!boton) return;
+            const url = document.getElementById('linkUrl').textContent.trim();
+            const aviso = document.getElementById('copiado');
+            boton.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(url);
+                    aviso.textContent = 'Link copiado.';
+                } catch (e) {
+                    // Sin permiso de portapapeles: queda seleccionado para copiarlo a mano
+                    const rango = document.createRange();
+                    rango.selectNodeContents(document.getElementById('linkUrl'));
+                    const seleccion = window.getSelection();
+                    seleccion.removeAllRanges();
+                    seleccion.addRange(rango);
+                    aviso.textContent = 'Seleccionado: copialo con el menú del teléfono o Ctrl+C.';
+                }
+            });
+        })();
+    </script>
+</th:block>
+</body>
+</html>

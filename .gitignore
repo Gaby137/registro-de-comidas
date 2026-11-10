@@ -20,9 +20,11 @@ Thumbs.db
 # Env
 .env
 
-# Uploads (no subir archivos de usuarios al repo)
-uploads/*
-!uploads/.gitkeep
+# Fotos de comidas (privadas: nunca al repo)
+fotos-privadas/
+
+# Archivos del starter kit que esta app no usa (respaldo local, se puede borrar)
+_kit-removido/
 
 # Logs
 *.log

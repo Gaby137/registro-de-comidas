@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--
+  Layout de la vista compartida con la nutricionista (/ver/<token>).
+  Solo lectura: sin navegación, sin login y sin ningún control de edición.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <!-- Que no aparezca en buscadores ni se filtre el token al salir a otro sitio -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <meta name="theme-color" content="#0f766e">
+
+    <title layout:title-pattern="$CONTENT_TITLE">Registro de comidas</title>
+
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/comidas.css}">
+</head>
+<body>
+
+<main class="publico">
+    <div layout:fragment="content"></div>
+</main>
+
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

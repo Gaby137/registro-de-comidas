@@ -1,81 +1,77 @@
 package com.comidas.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.security.web.savedrequest.SavedRequest;
 
 /**
- * Configuración de seguridad MVC: form login + sesiones + CSRF.
- * Para proteger rutas nuevas: sumá requestMatchers en la cadena
- * o usá @PreAuthorize en el controller (method security habilitado).
+ * Seguridad de la app: un solo dueño (rol ADMIN) con form login, sesión, CSRF y remember-me.
+ * <p>
+ * Lo único público es el login, los estáticos y la vista compartida de solo lectura
+ * ({@code GET /ver/<token>}), que valida su token en el controller.
  */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    /** La app instalada en el celular tiene que abrir ya logueada: la cookie dura 180 días. */
+    private static final int REMEMBER_ME_SEGUNDOS = 180 * 24 * 60 * 60;
+    private static final int REMEMBER_ME_KEY_MINIMO = 32;
+
     @Bean
-    public SecurityFilterChain mvcSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain mvcSecurityFilterChain(HttpSecurity http,
+                                                      UserDetailsService userDetailsService,
+                                                      @Value("${app.remember-me.key:}") String rememberMeKey)
+            throws Exception {
+        if (rememberMeKey.length() < REMEMBER_ME_KEY_MINIMO) {
+            throw new IllegalStateException("app.remember-me.key (REMEMBER_ME_KEY) debe tener al menos "
+                    + REMEMBER_ME_KEY_MINIMO + " caracteres");
+        }
+
         http
                 .authorizeHttpRequests(auth -> auth
-                        // Recursos estáticos y health check
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico", "/uploads/**").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
-                        // Páginas públicas
-                        .requestMatchers("/", "/error").permitAll()
-                        .requestMatchers("/login", "/registro").permitAll()
-                        // Panel admin
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // Todo lo demás requiere autenticación
-                        .anyRequest().authenticated()
+                        // Estáticos, manifest de la PWA y health check
+                        .requestMatchers("/css/**", "/js/**", "/icons/**", "/manifest.webmanifest", "/favicon.ico")
+                        .permitAll()
+                        .requestMatchers("/actuator/health", "/error").permitAll()
+                        // Vista de la nutricionista: solo lectura, el token se valida en VerController
+                        .requestMatchers(HttpMethod.GET, "/ver/**").permitAll()
+                        // Todo lo demás es del dueño
+                        .anyRequest().hasRole("ADMIN")
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .usernameParameter("email")
                         .passwordParameter("contrasena")
-                        .successHandler(authenticationSuccessHandler())
+                        .defaultSuccessUrl("/")
                         .failureUrl("/login?error")
                         .permitAll()
+                )
+                .rememberMe(remember -> remember
+                        .key(rememberMeKey)
+                        .userDetailsService(userDetailsService)
+                        .alwaysRemember(true)
+                        .tokenValiditySeconds(REMEMBER_ME_SEGUNDOS)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
+                        .deleteCookies("JSESSIONID", "remember-me")
                         .permitAll()
                 );
 
         return http.build();
-    }
-
-    /**
-     * Después del login: vuelve a la página protegida que se pidió originalmente;
-     * si no había ninguna, admins al panel y usuarios al home.
-     */
-    @Bean
-    public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        RequestCache requestCache = new HttpSessionRequestCache();
-        return (request, response, authentication) -> {
-            SavedRequest saved = requestCache.getRequest(request, response);
-            if (saved != null) {
-                requestCache.removeRequest(request, response);
-                response.sendRedirect(saved.getRedirectUrl());
-                return;
-            }
-            boolean isAdmin = authentication.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-            response.sendRedirect(request.getContextPath() + (isAdmin ? "/admin" : "/"));
-        };
     }
 
     @Bean

@@ -41,14 +41,17 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       COOKIE_SECURE: ${COOKIE_SECURE:-true}
-      UPLOAD_DIR: /app/uploads
-      # Zona horaria de la JVM (fechas de alta, logs)
+      # Firma la cookie que mantiene la sesión en el celular (mínimo 32 caracteres; sin ella la app no arranca)
+      REMEMBER_ME_KEY: ${REMEMBER_ME_KEY:-}
+      # Fotos privadas: solo las sirve la app, validando sesión o token del link
+      FOTOS_DIR: /app/fotos
+      # Zona horaria de la JVM (logs). Las fechas se guardan en UTC y se muestran en hora de Argentina.
       TZ: ${TZ:-America/Argentina/Buenos_Aires}
     ports:
       - "${APP_PORT:-8080}:8080"
     volumes:
-      - uploads_data:/app/uploads
+      - fotos_data:/app/fotos
 
 volumes:
   db_data:
-  uploads_data:
+  fotos_data:

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/app}">
+<head>
+    <title>Editar comida</title>
+</head>
+<body>
+<div layout:fragment="content" class="angosto">
+    <h1 class="titulo-pagina">Editar comida</h1>
+
+    <img class="registro-foto" th:src="@{/fotos/{id}(id=${registro.id})}" alt="Foto de la comida">
+
+    <form th:action="@{/registros/{id}/editar(id=${registro.id})}" th:object="${registroForm}" method="post"
+          class="formulario">
+        <div class="form-group">
+            <label for="platoId">Plato</label>
+            <select id="platoId" th:field="*{platoId}">
+                <option value="">Sin plato (pendiente)</option>
+                <option th:each="p : ${platos}" th:value="${p.id}"
+                        th:text="${p.archivado} ? ${p.nombre} + ' (archivado)' : ${p.nombre}">Milanesa</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="fechaHora">Fecha y hora</label>
+            <input type="datetime-local" id="fechaHora" name="fechaHora" required
+                   th:value="${#temporals.format(registroForm.fechaHora, 'yyyy-MM-dd''T''HH:mm')}">
+            <span class="ayuda">Hora de Argentina.</span>
+        </div>
+
+        <div class="form-group">
+            <label for="nota">Nota</label>
+            <textarea id="nota" th:field="*{nota}" maxlength="500"
+                      placeholder="Por ejemplo: comí la mitad, con gaseosa"></textarea>
+        </div>
+
+        <div class="acciones">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a class="btn btn-outline" th:href="@{/semana(fecha=${registro.fecha})}">Cancelar</a>
+        </div>
+    </form>
+
+    <section class="seccion">
+        <button type="button" class="btn btn-danger" id="btnBorrar">Borrar comida</button>
+    </section>
+
+    <!-- Confirmación: borrar también elimina la foto -->
+    <dialog class="confirmar" id="confirmarBorrado" aria-labelledby="confirmarTitulo">
+        <h2 id="confirmarTitulo">¿Borrar esta comida?</h2>
+        <p>Se borra el registro y también la foto. No se puede deshacer.</p>
+        <form th:action="@{/registros/{id}/borrar(id=${registro.id})}" method="post" class="acciones">
+            <button type="button" class="btn btn-outline" id="btnCancelarBorrado">Cancelar</button>
+            <button type="submit" class="btn btn-danger">Sí, borrar</button>
+        </form>
+    </dialog>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        (function () {
+            const dialogo = document.getElementById('confirmarBorrado');
+            document.getElementById('btnBorrar').addEventListener('click', () => dialogo.showModal());
+            document.getElementById('btnCancelarBorrado').addEventListener('click', () => dialogo.close());
+        })();
+    </script>
+</th:block>
+</body>
+</html>

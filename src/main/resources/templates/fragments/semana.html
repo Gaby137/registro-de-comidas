@@ -1,0 +1,78 @@
+<!--
+  Vista semanal: la misma para el dueño (/semana) y la nutricionista (/ver/<token>).
+
+  Parámetros:
+    semana      SemanaVista
+    baseUrl     URL de la página, para navegar entre semanas ("/semana" o "/ver/<token>")
+    fotoBase    prefijo de las fotos ("/fotos" o "/ver/<token>/fotos")
+    soloLectura true para la nutricionista: no se genera ningún control de edición
+-->
+<div th:fragment="semana(semana, baseUrl, fotoBase, soloLectura)" xmlns:th="http://www.thymeleaf.org">
+
+    <div class="semana-nav">
+        <h2 class="semana-titulo" th:text="|Semana del ${semana.titulo}|">Semana del 9 al 15 de noviembre de 2026</h2>
+
+        <div class="semana-botones">
+            <a class="btn btn-outline btn-sm" th:href="@{${baseUrl}(fecha=${semana.anterior})}">← Anterior</a>
+            <a class="btn btn-outline btn-sm" th:href="@{${baseUrl}}"
+               th:attr="aria-current=${semana.esActual ? 'true' : null}">Semana actual</a>
+            <a class="btn btn-outline btn-sm" th:href="@{${baseUrl}(fecha=${semana.siguiente})}">Siguiente →</a>
+        </div>
+
+        <!-- Entre consultas pasan dos meses: el selector salta a la semana de cualquier fecha -->
+        <form class="semana-fecha" method="get" th:action="@{${baseUrl}}">
+            <label for="irAFecha">Ir a</label>
+            <input type="date" id="irAFecha" name="fecha" class="campo" th:value="${semana.lunes}" required>
+            <button type="submit" class="btn btn-outline btn-sm">Ver</button>
+        </form>
+    </div>
+
+    <div class="semana-grid">
+        <section class="dia" th:each="dia : ${semana.dias}" th:classappend="${dia.hoy} ? 'hoy'">
+            <header class="dia-cabecera">
+                <span class="dia-nombre" th:text="${dia.nombre}">lunes</span>
+                <span class="dia-fecha" th:text="${dia.fechaCorta}">9/11</span>
+            </header>
+
+            <p class="dia-vacio" th:if="${#lists.isEmpty(dia.registros)}">Sin registros</p>
+
+            <div class="dia-comidas" th:unless="${#lists.isEmpty(dia.registros)}">
+                <button type="button" class="mini" th:each="r : ${dia.registros}"
+                        th:classappend="${r.pendiente} ? 'pendiente'"
+                        th:attr="data-foto=@{|${fotoBase}/${r.id}|},
+                                 data-plato=${r.platoNombre},
+                                 data-descripcion=${r.platoDescripcion},
+                                 data-fecha=|${r.fechaLarga}, ${r.hora}|,
+                                 data-nota=${r.nota},
+                                 data-editar=${soloLectura ? null : '/registros/' + r.id + '/editar'},
+                                 aria-label=|${r.hora}, ${r.platoNombre ?: 'sin identificar'}. Ver detalle|">
+                    <img th:src="@{|${fotoBase}/${r.id}/mini|}" alt="" loading="lazy" width="400" height="300">
+                    <span class="mini-texto">
+                        <span class="mini-hora" th:text="${r.hora}">13:05</span>
+                        <span class="mini-plato" th:if="${!r.pendiente}" th:text="${r.platoNombre}">Milanesa</span>
+                        <span class="mini-plato sin-plato" th:if="${r.pendiente}">Sin identificar</span>
+                    </span>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Detalle de una comida. Se cierra con la X, con Escape o tocando fuera. -->
+    <dialog class="modal" id="modal" aria-labelledby="modalPlato">
+        <div class="modal-caja">
+            <div class="modal-foto">
+                <img id="modalFoto" alt="">
+                <button type="button" class="modal-flecha anterior" id="modalAnterior" aria-label="Comida anterior">‹</button>
+                <button type="button" class="modal-flecha siguiente" id="modalSiguiente" aria-label="Comida siguiente">›</button>
+                <button type="button" class="modal-cerrar" id="modalCerrar" aria-label="Cerrar">×</button>
+            </div>
+            <div class="modal-info">
+                <h3 class="modal-plato" id="modalPlato"></h3>
+                <p class="modal-fecha" id="modalFecha"></p>
+                <p class="modal-descripcion" id="modalDescripcion"></p>
+                <p class="modal-nota" id="modalNota"><span class="modal-nota-etiqueta">Nota: </span><span id="modalNotaTexto"></span></p>
+                <a class="btn btn-outline modal-editar" id="modalEditar" th:unless="${soloLectura}" href="#">Editar</a>
+            </div>
+        </div>
+    </dialog>
+</div>

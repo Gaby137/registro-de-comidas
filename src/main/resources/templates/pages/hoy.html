@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/app}">
+<head>
+    <title>Hoy</title>
+</head>
+<body>
+<div layout:fragment="content" class="angosto">
+
+    <!-- Toque 1: sacar la foto. El input abre la cámara trasera sin permisos especiales. -->
+    <button type="button" id="btnFoto" class="btn btn-primary btn-foto">Sacar foto</button>
+    <input type="file" id="inputFoto" accept="image/*" capture="environment" hidden>
+
+    <section class="seccion">
+        <h2>Hoy</h2>
+        <p class="vacio" th:if="${#lists.isEmpty(registrosHoy)}">Todavía no cargaste comidas hoy.</p>
+        <ul class="lista-comidas" th:unless="${#lists.isEmpty(registrosHoy)}">
+            <li class="comida" th:each="r : ${registrosHoy}" th:classappend="${r.pendiente} ? 'pendiente'">
+                <img th:src="@{/fotos/{id}/mini(id=${r.id})}" alt="" width="72" height="72" loading="lazy">
+                <div class="comida-datos">
+                    <div class="comida-hora" th:text="${r.hora}">13:05</div>
+                    <div class="comida-plato" th:if="${!r.pendiente}" th:text="${r.platoNombre}">Milanesa</div>
+                    <span class="etiqueta-pendiente" th:if="${r.pendiente}">Pendiente</span>
+                    <div class="comida-nota" th:if="${r.nota}" th:text="${r.nota}">comí la mitad</div>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm" th:if="${r.pendiente}"
+                        th:attr="data-completar=${r.id}, data-mini=@{/fotos/{id}/mini(id=${r.id})}">Completar</button>
+                <a class="btn btn-outline btn-sm" th:unless="${r.pendiente}"
+                   th:href="@{/registros/{id}/editar(id=${r.id})}">Editar</a>
+            </li>
+        </ul>
+    </section>
+
+    <section class="seccion" th:unless="${#lists.isEmpty(pendientes)}">
+        <h2>Pendientes de otros días</h2>
+        <ul class="lista-comidas">
+            <li class="comida pendiente" th:each="r : ${pendientes}">
+                <img th:src="@{/fotos/{id}/mini(id=${r.id})}" alt="" width="72" height="72" loading="lazy">
+                <div class="comida-datos">
+                    <div class="comida-hora" th:text="|${r.fechaCorta} · ${r.hora}|">sáb 7/11 · 21:10</div>
+                    <span class="etiqueta-pendiente">Pendiente</span>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm"
+                        th:attr="data-completar=${r.id}, data-mini=@{/fotos/{id}/mini(id=${r.id})}">Completar</button>
+            </li>
+        </ul>
+    </section>
+
+    <!-- Toque 2: selección rápida. Aparece mientras la foto se sube sola. -->
+    <div id="panel" class="panel" hidden role="dialog" aria-modal="true" aria-labelledby="panelTitulo">
+        <div class="panel-cabecera">
+            <img id="panelFoto" alt="" width="64" height="64">
+            <div>
+                <div class="panel-titulo" id="panelTitulo">¿Qué comiste?</div>
+                <div class="panel-estado" id="panelEstado" role="status" aria-live="polite"></div>
+                <button type="button" id="btnReintentar" class="btn btn-primary btn-sm" hidden>Reintentar</button>
+            </div>
+        </div>
+
+        <div class="panel-cuerpo">
+            <div id="vistaLista">
+                <input type="search" id="buscador" class="campo" placeholder="Buscar plato"
+                       aria-label="Buscar plato por nombre" autocomplete="off">
+                <div id="listaPlatos" aria-live="polite"></div>
+            </div>
+
+            <form id="formNuevo" class="formulario" hidden>
+                <div class="form-group">
+                    <label for="nuevoNombre">Nombre del plato</label>
+                    <input type="text" id="nuevoNombre" maxlength="120" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="nuevoDescripcion">Descripción corta</label>
+                    <input type="text" id="nuevoDescripcion" maxlength="500" autocomplete="off"
+                           placeholder="Qué lleva y porción aproximada">
+                </div>
+                <div class="alert alert-error" id="nuevoError" hidden></div>
+                <div class="acciones">
+                    <button type="submit" class="btn btn-primary">Guardar plato</button>
+                    <button type="button" class="btn btn-outline" id="btnCancelarNuevo">Volver a la lista</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel-pie">
+            <button type="button" class="btn btn-outline" id="btnNuevo">Plato nuevo</button>
+            <button type="button" class="btn btn-outline" id="btnDespues">Después</button>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/carga.js}"></script>
+</th:block>
+</body>
+</html>
